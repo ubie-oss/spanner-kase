@@ -9,7 +9,7 @@ import com.google.cloud.spanner.Statement
 import java.sql.Timestamp
 import java.time.ZoneOffset
 
-class SpannerKaseDatabaseClientImplementation(
+internal class SpannerKaseDatabaseClientImplementation(
     private val instanceId: String,
     private val databaseId: String,
     private val databaseAdminClient: DatabaseAdminClient,
