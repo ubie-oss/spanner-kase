@@ -20,7 +20,7 @@ class MigrationDataScanner(private val classLoader: ClassLoader, private val pat
                     emptyList()
                 }
             }
-        }.flatten().sortedBy(MigrationData::getVersion)
+        }.flatten().sortedBy(MigrationData::version)
     }
 
     private fun fileScan(url: URL): List<MigrationData> {

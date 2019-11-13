@@ -160,12 +160,12 @@ internal class SpannerKaseTest {
         }
     }
 
-    fun createMockkMigrationData(version: Long, name: String, sql: String, checksum: Long): MigrationData {
+    fun createMockkMigrationData(mockVersion: Long, mockName: String, mockSql: String, mockChecksum: Long): MigrationData {
         return mockk {
-            every { getVersion() } returns version
-            every { getName() } returns name
-            every { getSql() } returns sql
-            every { getChecksum() } returns checksum
+            every { version } returns mockVersion
+            every { name } returns mockName
+            every { sql } returns mockSql
+            every { checksum } returns mockChecksum
         }
     }
 }

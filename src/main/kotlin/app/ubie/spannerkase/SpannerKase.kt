@@ -31,27 +31,27 @@ class SpannerKase(
         // verify checksum
         val versionHistories = schemeHistoryRepository.versionHistories()
         findInvalidChecksumMigrationData(migrationDataList, versionHistories)?.let {
-            throw IllegalStateException("checksum is different. ${it.getName()}")
+            throw IllegalStateException("checksum is different. ${it.name}")
         }
 
         // verify versions
         val currentVersion = schemeHistoryRepository.currentVersion()?.version ?: 0
         findInvalidVersionMigrationData(migrationDataList, versionHistories, currentVersion)?.let {
-            throw IllegalStateException("find a migration file that older than current version. ${it.getName()}")
+            throw IllegalStateException("find a migration file that older than current version. ${it.name}")
         }
 
         // get new migration files
         migrationDataList
-            .filter { it.getVersion() > currentVersion }
+            .filter { it.version > currentVersion }
             .forEach { migrationData ->
-                val sql = migrationData.getSql()
+                val sql = migrationData.sql
                 databaseClient.executeSql(sql)
                 databaseClient.insertSchemeHistory(
                     SchemeHistory(
-                        migrationData.getVersion(),
-                        migrationData.getVersion(),
-                        migrationData.getName(),
-                        migrationData.getChecksum(),
+                        migrationData.version,
+                        migrationData.version,
+                        migrationData.name,
+                        migrationData.checksum,
                         LocalDateTime.now()
                     )
                 )
@@ -65,7 +65,7 @@ class SpannerKase(
     ): MigrationData? {
         return versionHistories.asSequence()
             .mapNotNull { history ->
-                migrationDataList.find { it.getVersion() == history.version && it.getChecksum() != history.checksum }
+                migrationDataList.find { it.version == history.version && it.checksum != history.checksum }
             }
             .firstOrNull()
     }
@@ -76,7 +76,7 @@ class SpannerKase(
         currentVersion: Long
     ): MigrationData? {
         return migrationDataList.find { migrationData ->
-            migrationData.getVersion() < currentVersion && versionHistories.any { migrationData.getVersion() == it.version }.not()
+            migrationData.version < currentVersion && versionHistories.any { migrationData.version == it.version }.not()
         }
     }
 }
