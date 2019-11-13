@@ -66,10 +66,10 @@ internal class MigrationDataScannerTest {
             val files = migrationDataScanner.scan()
             assertThat(files.size).isEqualTo(2)
             files.forEach {
-                println(it.getName())
-                println(it.getVersion())
-                println(it.getSql())
-                println(it.getChecksum())
+                println(it.name)
+                println(it.version)
+                println(it.sql)
+                println(it.checksum)
             }
         }
     }

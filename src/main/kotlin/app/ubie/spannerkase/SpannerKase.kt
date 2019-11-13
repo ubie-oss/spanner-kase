@@ -2,8 +2,27 @@ package app.ubie.spannerkase
 
 import java.time.LocalDateTime
 
-class SpannerKase(val schemeHistoryRepository: SchemeHistoryRepository, val migrationDataScanner: MigrationDataScanner) {
-    fun migrate(databaseClient: SpannerKaseDatabaseClient) {
+class SpannerKase(
+    val configure: Configure
+) {
+    class Configure(
+        val databaseClient: SpannerKaseDatabaseClient,
+        private val classLoader: ClassLoader,
+        private val path: String
+    ) {
+        fun createSchemeHistoryRepository(): SchemeHistoryRepository {
+            return SchemeHistoryRepository(databaseClient)
+        }
+
+        fun createMigrationDataScanner(): MigrationDataScanner {
+            return MigrationDataScanner(classLoader, path)
+        }
+    }
+
+    fun migrate() {
+        val databaseClient = configure.databaseClient
+        val migrationDataScanner = configure.createMigrationDataScanner()
+        val schemeHistoryRepository = configure.createSchemeHistoryRepository()
         val migrationDataList = migrationDataScanner.scan()
         if (migrationDataList.isEmpty()) {
             return
@@ -11,39 +30,53 @@ class SpannerKase(val schemeHistoryRepository: SchemeHistoryRepository, val migr
 
         // verify checksum
         val versionHistories = schemeHistoryRepository.versionHistories()
-        versionHistories.forEach { history ->
-            val version = history.version
-            migrationDataList.find { it.getVersion() == version }?.let { migrationData ->
-                if (history.checksum != migrationData.getChecksum()) {
-                    throw IllegalStateException("checksum is different. ${migrationData.getName()}")
-                }
-            }
+        findInvalidChecksumMigrationData(migrationDataList, versionHistories)?.let {
+            throw IllegalStateException("checksum is different. ${it.name}")
         }
 
-        val currentVersion = schemeHistoryRepository.currentVersion()?.version ?: 0
         // verify versions
-        migrationDataList
-            .filter { it.getVersion() < currentVersion }
-            .forEach { migrationData ->
-                versionHistories.find { migrationData.getVersion() == it.version }
-                    ?: throw IllegalStateException("find a migration file that older than current version. ${migrationData.getName()}")
-            }
+        val currentVersion = schemeHistoryRepository.currentVersion()?.version ?: 0
+        findInvalidVersionMigrationData(migrationDataList, versionHistories, currentVersion)?.let {
+            throw IllegalStateException("find a migration file that older than current version. ${it.name}")
+        }
 
         // get new migration files
         migrationDataList
-            .filter { it.getVersion() > currentVersion }
+            .filter { it.version > currentVersion }
             .forEach { migrationData ->
-                val sql = migrationData.getSql()
+                val sql = migrationData.sql
                 databaseClient.executeSql(sql)
                 databaseClient.insertSchemeHistory(
                     SchemeHistory(
-                        migrationData.getVersion(),
-                        migrationData.getVersion(),
-                        migrationData.getName(),
-                        migrationData.getChecksum(),
+                        migrationData.version,
+                        migrationData.version,
+                        migrationData.name,
+                        migrationData.checksum,
                         LocalDateTime.now()
                     )
                 )
             }
+    }
+
+
+    private fun findInvalidChecksumMigrationData(
+        migrationDataList: List<MigrationData>,
+        versionHistories: List<SchemeHistory>
+    ): MigrationData? {
+        return versionHistories.asSequence()
+            .mapNotNull { history ->
+                migrationDataList.find { it.version == history.version && it.checksum != history.checksum }
+            }
+            .firstOrNull()
+    }
+
+    private fun findInvalidVersionMigrationData(
+        migrationDataList: List<MigrationData>,
+        versionHistories: List<SchemeHistory>,
+        currentVersion: Long
+    ): MigrationData? {
+        return migrationDataList.find { migrationData ->
+            migrationData.version < currentVersion && versionHistories.any { migrationData.version == it.version }.not()
+        }
     }
 }
