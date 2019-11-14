@@ -1,13 +1,13 @@
 package app.ubie.spannerkase
 
 import app.ubie.spannerkase.internal.SchemeHistory
+import app.ubie.spannerkase.internal.insert
+import app.ubie.spannerkase.internal.set
+import app.ubie.spannerkase.internal.toTimestamp
 import com.google.cloud.spanner.DatabaseAdminClient
 import com.google.cloud.spanner.DatabaseClient
-import com.google.cloud.spanner.Mutation
 import com.google.cloud.spanner.ResultSet
 import com.google.cloud.spanner.Statement
-import java.sql.Timestamp
-import java.time.ZoneOffset
 
 class SpannerKaseDatabaseClient(
     private val instanceId: String,
@@ -85,29 +85,24 @@ class SpannerKaseDatabaseClient(
     }
 
     internal fun insertSchemeHistory(schemeHistory: SchemeHistory) {
-        val mutation = Mutation.newInsertBuilder("SchemeHistory")
-            .set("InstalledRank")
-            .to(schemeHistory.installedRank)
-            .set("Version")
-            .to(schemeHistory.version)
-            .set("Script")
-            .to(schemeHistory.script)
-            .set("Checksum")
-            .to(schemeHistory.checksum)
-            .set("InstalledOn")
-            .to(com.google.cloud.Timestamp.of(Timestamp.from(schemeHistory.installedOn.toInstant(ZoneOffset.UTC))))
-            .build()
+        val mutation = insert("SchemeHistory") {
+            it["InstalledRank"] = schemeHistory.installedRank
+            it["Version"] = schemeHistory.version
+            it["Script"] = schemeHistory.script
+            it["Checksum"] = schemeHistory.checksum
+            it["InstalledOn"] = schemeHistory.installedOn.toTimestamp()
+        }
         databaseClient.write(listOf(mutation))
     }
 
     private fun alreadyInitialized(): Boolean {
         val sql = """
-SELECT
-  count(0) as count
-FROM
-  information_schema.tables AS t
-WHERE
-  t.table_catalog = '' and t.table_schema = '' and t.table_name = 'SchemeHistory'
+            SELECT
+              count(0) as count
+            FROM
+              information_schema.tables AS t
+            WHERE
+              t.table_catalog = '' and t.table_schema = '' and t.table_name = 'SchemeHistory'
 """.trimIndent()
         return databaseClient.singleUse().executeQuery(Statement.of(sql)).run {
             next()
