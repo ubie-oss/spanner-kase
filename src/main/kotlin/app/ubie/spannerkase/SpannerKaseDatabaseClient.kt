@@ -1,5 +1,6 @@
 package app.ubie.spannerkase
 
+import app.ubie.spannerkase.internal.SchemeHistory
 import com.google.cloud.spanner.DatabaseAdminClient
 import com.google.cloud.spanner.Mutation
 import com.google.cloud.spanner.ResultSet
@@ -63,7 +64,7 @@ CREATE TABLE SchemeHistory (
         ).get()
     }
 
-    fun allSchemeHistory(): List<SchemeHistory> {
+    internal fun allSchemeHistory(): List<SchemeHistory> {
         val sql =
             //language=SQL
             """
@@ -85,7 +86,7 @@ ORDER BY InstalledRank
         }.toList()
     }
 
-    fun insertSchemeHistory(schemeHistory: SchemeHistory) {
+    internal fun insertSchemeHistory(schemeHistory: SchemeHistory) {
         val mutation = Mutation.newInsertBuilder("SchemeHistory")
             .set("InstalledRank")
             .to(schemeHistory.installedRank)

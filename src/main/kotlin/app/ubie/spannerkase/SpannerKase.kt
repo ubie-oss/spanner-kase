@@ -1,5 +1,9 @@
 package app.ubie.spannerkase
 
+import app.ubie.spannerkase.internal.MigrationData
+import app.ubie.spannerkase.internal.MigrationDataScanner
+import app.ubie.spannerkase.internal.SchemeHistory
+import app.ubie.spannerkase.internal.SchemeHistoryRepository
 import java.time.LocalDateTime
 
 class SpannerKase(
@@ -10,11 +14,13 @@ class SpannerKase(
         private val classLoader: ClassLoader,
         private val path: String
     ) {
-        fun createSchemeHistoryRepository(): SchemeHistoryRepository {
-            return SchemeHistoryRepository(databaseClient)
+        internal fun createSchemeHistoryRepository(): SchemeHistoryRepository {
+            return SchemeHistoryRepository(databaseClient).apply {
+                createSchemeHistory()
+            }
         }
 
-        fun createMigrationDataScanner(): MigrationDataScanner {
+        internal fun createMigrationDataScanner(): MigrationDataScanner {
             return MigrationDataScanner(classLoader, path)
         }
     }

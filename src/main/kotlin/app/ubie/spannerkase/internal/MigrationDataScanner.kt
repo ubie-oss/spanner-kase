@@ -1,11 +1,11 @@
-package app.ubie.spannerkase
+package app.ubie.spannerkase.internal
 
 import sun.net.www.protocol.jar.JarURLConnection
 import java.io.File
 import java.net.URL
 import java.util.jar.JarFile
 
-class MigrationDataScanner(private val classLoader: ClassLoader, private val path: String) {
+internal class MigrationDataScanner(private val classLoader: ClassLoader, private val path: String) {
     fun scan(): List<MigrationData> {
         return classLoader.getResources(path).toList().flatMap { url ->
             when (url.protocol) {

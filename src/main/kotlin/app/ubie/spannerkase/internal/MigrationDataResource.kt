@@ -1,6 +1,6 @@
-package app.ubie.spannerkase
+package app.ubie.spannerkase.internal
 
-class MigrationDataResource(
+internal class MigrationDataResource(
     private val prefix: String,
     override val name: String,
     private val classLoader: ClassLoader

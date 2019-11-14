@@ -1,10 +1,11 @@
-package app.ubie.spannerkase
+package app.ubie.spannerkase.internal
 
-class SchemeHistoryRepository(private val client: SpannerKaseDatabaseClient) {
-    init {
+import app.ubie.spannerkase.SpannerKaseDatabaseClient
+
+internal class SchemeHistoryRepository(private val client: SpannerKaseDatabaseClient) {
+    fun createSchemeHistory() {
          client.createSchemeHistory()
     }
-
     fun currentVersion(): SchemeHistory? {
         return client.allSchemeHistory().lastOrNull()
     }

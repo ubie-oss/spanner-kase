@@ -1,5 +1,6 @@
-package app.ubie.spannerkase
+package app.ubie.spannerkase.testtool.internal
 
+import app.ubie.spannerkase.internal.MigrationDataScanner
 import app.ubie.spannerkase.testtool.toEnumeration
 import io.mockk.every
 import io.mockk.mockk
@@ -62,7 +63,8 @@ internal class MigrationDataScannerTest {
     inner class scan {
         @Test
         fun scanFromTestEnvironment() {
-            val migrationDataScanner = MigrationDataScanner(this.javaClass.classLoader, "db/migration")
+            val migrationDataScanner =
+                MigrationDataScanner(this.javaClass.classLoader, "db/migration")
             val files = migrationDataScanner.scan()
             assertThat(files.size).isEqualTo(2)
             files.forEach {

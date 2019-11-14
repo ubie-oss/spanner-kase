@@ -1,9 +1,9 @@
-package app.ubie.spannerkase
+package app.ubie.spannerkase.internal
 
 import com.google.common.hash.Hashing
 import java.nio.charset.Charset
 
-abstract class MigrationData {
+internal abstract class MigrationData {
     abstract val name: String
     abstract val sql: String
 

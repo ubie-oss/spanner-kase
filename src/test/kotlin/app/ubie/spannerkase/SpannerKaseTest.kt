@@ -1,5 +1,9 @@
 package app.ubie.spannerkase
 
+import app.ubie.spannerkase.internal.MigrationData
+import app.ubie.spannerkase.internal.MigrationDataScanner
+import app.ubie.spannerkase.internal.SchemeHistory
+import app.ubie.spannerkase.internal.SchemeHistoryRepository
 import io.mockk.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
