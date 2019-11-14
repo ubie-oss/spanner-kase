@@ -48,14 +48,14 @@ class SpannerKaseDatabaseClient(
         val sql =
             //language=SQL
             """
-CREATE TABLE SchemeHistory (
-	InstalledRank INT64 NOT NULL,
-	Version INT64 NOT NULL,
-	Script STRING(1000) NOT NULL,
-	Checksum INT64 NOT NULL,
-	InstalledOn TIMESTAMP NOT NULL
-) PRIMARY KEY (InstalledRank)
-"""
+            CREATE TABLE SchemeHistory (
+                InstalledRank INT64 NOT NULL,
+                Version INT64 NOT NULL,
+                Script STRING(1000) NOT NULL,
+                Checksum INT64 NOT NULL,
+                InstalledOn TIMESTAMP NOT NULL
+            ) PRIMARY KEY (InstalledRank)
+            """.trimIndent()
         databaseAdminClient.updateDatabaseDdl(
             instanceId,
             databaseId,
@@ -68,11 +68,11 @@ CREATE TABLE SchemeHistory (
         val sql =
             //language=SQL
             """
-SELECT
-    InstalledRank, Version, Script, Checksum, InstalledOn
-FROM
-    SchemeHistory
-ORDER BY InstalledRank
+            SELECT
+                InstalledRank, Version, Script, Checksum, InstalledOn
+            FROM
+                SchemeHistory
+            ORDER BY InstalledRank
             """.trimIndent()
         val statement = Statement.of(sql)
         return databaseClient.singleUse().executeQuery(statement).asSequence().map {
