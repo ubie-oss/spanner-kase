@@ -7,7 +7,7 @@ import java.util.jar.JarFile
 
 class MigrationDataScanner(private val classLoader: ClassLoader, private val path: String) {
     fun scan(): List<MigrationData> {
-        return classLoader.getResources(path).toList().map { url ->
+        return classLoader.getResources(path).toList().flatMap { url ->
             when (url.protocol) {
                 "file" -> {
                     fileScan(url)
@@ -20,7 +20,7 @@ class MigrationDataScanner(private val classLoader: ClassLoader, private val pat
                     emptyList()
                 }
             }
-        }.flatten().sortedBy(MigrationData::version)
+        }.sortedBy(MigrationData::version)
     }
 
     private fun fileScan(url: URL): List<MigrationData> {
