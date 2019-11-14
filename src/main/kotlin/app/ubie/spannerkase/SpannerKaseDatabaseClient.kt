@@ -2,6 +2,7 @@ package app.ubie.spannerkase
 
 import app.ubie.spannerkase.internal.SchemeHistory
 import com.google.cloud.spanner.DatabaseAdminClient
+import com.google.cloud.spanner.DatabaseClient
 import com.google.cloud.spanner.Mutation
 import com.google.cloud.spanner.ResultSet
 import com.google.cloud.spanner.Statement
@@ -12,7 +13,7 @@ class SpannerKaseDatabaseClient(
     private val instanceId: String,
     private val databaseId: String,
     private val databaseAdminClient: DatabaseAdminClient,
-    private val databaseClient: com.google.cloud.spanner.DatabaseClient
+    private val databaseClient: DatabaseClient
 ) {
     fun executeSql(sql: String) {
         val statements = sql.split(";").map { it.trim() }.filter { it.isNotEmpty() }
@@ -20,10 +21,7 @@ class SpannerKaseDatabaseClient(
             val value = it.toLowerCase()
             !value.startsWith("insert") && !value.startsWith("update") && !value.startsWith("delete")
         }
-        val update = statements.filter {
-            val value = it.toLowerCase()
-            value.startsWith("insert") || value.startsWith("update") || value.startsWith("delete")
-        }
+        val update = statements - ddl
         if (ddl.isNotEmpty()) {
             databaseAdminClient.updateDatabaseDdl(
                 instanceId,
