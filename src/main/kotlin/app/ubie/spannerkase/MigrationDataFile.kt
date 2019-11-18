@@ -1,8 +1,8 @@
-package app.ubie.spannerkase.internal
+package app.ubie.spannerkase
 
 import java.io.File
 
-internal class MigrationDataFile(
+class MigrationDataFile(
     private val file: File
 ) : MigrationData() {
     override val sql: String by lazy {

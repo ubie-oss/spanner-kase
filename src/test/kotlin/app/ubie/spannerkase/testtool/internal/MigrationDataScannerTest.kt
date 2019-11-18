@@ -1,6 +1,6 @@
 package app.ubie.spannerkase.testtool.internal
 
-import app.ubie.spannerkase.internal.MigrationDataScanner
+import app.ubie.spannerkase.ClassLoaderMigrationDataScanner
 import app.ubie.spannerkase.testtool.toEnumeration
 import io.mockk.every
 import io.mockk.mockk
@@ -19,7 +19,7 @@ internal class MigrationDataScannerTest {
         fun `success`() {
             val prefix = "db/migration"
             val classLoader: ClassLoader = createDummyClassLoader(prefix, listOf("V1__valid.sql", "V2__valid.sql"))
-            val migrationDataScanner = MigrationDataScanner(classLoader, prefix)
+            val migrationDataScanner = ClassLoaderMigrationDataScanner(classLoader, prefix)
             val resources = migrationDataScanner.scan()
 
             assertThat(resources.size).isEqualTo(2)
@@ -29,7 +29,7 @@ internal class MigrationDataScannerTest {
         fun `invalid file name, prefix V is not found`() {
             val prefix = "db/migration"
             val classLoader: ClassLoader = createDummyClassLoader(prefix, listOf("V1__valid.sql", "111__invalid.sql"))
-            val migrationDataScanner = MigrationDataScanner(classLoader, prefix)
+            val migrationDataScanner = ClassLoaderMigrationDataScanner(classLoader, prefix)
             val exception = assertThrows<Exception> {
                 migrationDataScanner.scan()
             }
@@ -40,7 +40,7 @@ internal class MigrationDataScannerTest {
         fun `invalid file name, version is not number`() {
             val prefix = "db/migration"
             val classLoader: ClassLoader = createDummyClassLoader(prefix, listOf("V1__valid.sql", "Vaaa__invalid.sql"))
-            val migrationDataScanner = MigrationDataScanner(classLoader, prefix)
+            val migrationDataScanner = ClassLoaderMigrationDataScanner(classLoader, prefix)
             val exception = assertThrows<Exception> {
                 migrationDataScanner.scan()
             }
@@ -51,7 +51,7 @@ internal class MigrationDataScannerTest {
         fun `invalid file name, wrong separator`() {
             val prefix = "db/migration"
             val classLoader: ClassLoader = createDummyClassLoader(prefix, listOf("V1__valid.sql", "V100_invalid.sql"))
-            val migrationDataScanner = MigrationDataScanner(classLoader, prefix)
+            val migrationDataScanner = ClassLoaderMigrationDataScanner(classLoader, prefix)
             val exception = assertThrows<Exception> {
                 migrationDataScanner.scan()
             }
@@ -64,7 +64,7 @@ internal class MigrationDataScannerTest {
         @Test
         fun scanFromTestEnvironment() {
             val migrationDataScanner =
-                MigrationDataScanner(this.javaClass.classLoader, "db/migration")
+                ClassLoaderMigrationDataScanner(this.javaClass.classLoader, "db/migration")
             val files = migrationDataScanner.scan()
             assertThat(files.size).isEqualTo(2)
             files.forEach {
