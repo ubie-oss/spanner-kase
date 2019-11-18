@@ -5,8 +5,9 @@ import java.io.File
 import java.net.URL
 import java.util.jar.JarFile
 
-class ClassLoaderMigrationDataScanner(private val classLoader: ClassLoader, private val path: String) {
-    fun scan(): List<MigrationData> {
+class ClassLoaderMigrationDataScanner(private val classLoader: ClassLoader, private val path: String) :
+    MigrationDataScanner {
+    override fun scan(): List<MigrationData> {
         return classLoader.getResources(path).toList().flatMap { url ->
             when (url.protocol) {
                 "file" -> {
