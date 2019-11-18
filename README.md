@@ -11,7 +11,7 @@ photo by [Felix Mittermeier](https://www.pexels.com/ja-jp/photo/957912/)
 spanner-kase depends on [google-cloud-spanner](https://github.com/googleapis/google-cloud-java/tree/master/google-cloud-clients/google-cloud-spanner), so you should set it to dependencies.
 
 ```kotlin
-implementation("app.ubie.spanner-kase:1.0.0")
+implementation("app.ubie.spanner-kase:1.1.1")
 implementation("com.google.cloud:google-cloud-spanner:$GOOGLE_CLOUD_SPANNER_VERSION")
 ```
 
