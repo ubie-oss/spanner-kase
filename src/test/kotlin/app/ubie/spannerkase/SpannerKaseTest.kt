@@ -1,6 +1,12 @@
 package app.ubie.spannerkase
 
-import io.mockk.*
+import app.ubie.spannerkase.internal.SchemeHistory
+import app.ubie.spannerkase.internal.SchemeHistoryRepository
+import io.mockk.Runs
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -17,7 +23,7 @@ internal class SpannerKaseTest {
             val configure: SpannerKase.Configure = mockk {
                 every { databaseClient } returns mockk()
                 every { createSchemeHistoryRepository() } returns schemeHistoryRepository
-                every { createMigrationDataScanner() } returns mockk {
+                every { migrationDataScanner } returns mockk {
                     every { scan() } returns emptyList()
                 }
             }
@@ -35,7 +41,7 @@ internal class SpannerKaseTest {
                 every { versionHistories() } returns emptyList()
                 every { currentVersion() } returns null
             }
-            val migrationDataScanner: MigrationDataScanner = mockk {
+            val mockMigrationDataScanner: MigrationDataScanner = mockk {
                 every { scan() } returns listOf(
                     createMockkMigrationData(1, "aaa", "aaa", 1),
                     createMockkMigrationData(2, "bbb", "bbb", 2)
@@ -48,7 +54,7 @@ internal class SpannerKaseTest {
             val configure: SpannerKase.Configure = mockk {
                 every { databaseClient } returns mockDatabaseClient
                 every { createSchemeHistoryRepository() } returns schemeHistoryRepository
-                every { createMigrationDataScanner() } returns migrationDataScanner
+                every { migrationDataScanner } returns mockMigrationDataScanner
             }
             val spannerKase = SpannerKase(configure)
             spannerKase.migrate()
@@ -67,7 +73,7 @@ internal class SpannerKaseTest {
                 )
                 every { currentVersion() } returns schemaHistory
             }
-            val migrationDataScanner: MigrationDataScanner = mockk {
+            val mockMigrationDataScanner: MigrationDataScanner = mockk {
                 every { scan() } returns listOf(
                     createMockkMigrationData(1, "aaa", "aaa", 1),
                     createMockkMigrationData(2, "bbb", "bbb", 2),
@@ -83,7 +89,7 @@ internal class SpannerKaseTest {
             val configure: SpannerKase.Configure = mockk {
                 every { databaseClient } returns mockDatabaseClient
                 every { createSchemeHistoryRepository() } returns schemeHistoryRepository
-                every { createMigrationDataScanner() } returns migrationDataScanner
+                every { migrationDataScanner } returns mockMigrationDataScanner
             }
             val spannerKase = SpannerKase(configure)
             spannerKase.migrate()
@@ -101,7 +107,7 @@ internal class SpannerKaseTest {
                 every { versionHistories() } returns listOf(schemaHistory1, schemaHistory2, schemaHistory3)
                 every { currentVersion() } returns schemaHistory3
             }
-            val migrationDataScanner: MigrationDataScanner = mockk {
+            val mockMigrationDataScanner: MigrationDataScanner = mockk {
                 every { scan() } returns listOf(
                     createMockkMigrationData(1, "aaa", "aaa", 1),
                     createMockkMigrationData(2, "bbb", "bbb", 2),
@@ -117,7 +123,7 @@ internal class SpannerKaseTest {
             val configure: SpannerKase.Configure = mockk {
                 every { databaseClient } returns mockDatabaseClient
                 every { createSchemeHistoryRepository() } returns schemeHistoryRepository
-                every { createMigrationDataScanner() } returns migrationDataScanner
+                every { migrationDataScanner } returns mockMigrationDataScanner
             }
             val spannerKase = SpannerKase(configure)
             val exception = assertThrows<Exception> {
@@ -134,7 +140,7 @@ internal class SpannerKaseTest {
                 every { versionHistories() } returns listOf(schemaHistory1, schemaHistory2)
                 every { currentVersion() } returns schemaHistory2
             }
-            val migrationDataScanner: MigrationDataScanner = mockk {
+            val mockMigrationDataScanner: MigrationDataScanner = mockk {
                 every { scan() } returns listOf(
                     createMockkMigrationData(1, "aaa", "aaa", 1),
                     createMockkMigrationData(2, "bbb", "bbb", 2),
@@ -150,7 +156,7 @@ internal class SpannerKaseTest {
             val configure: SpannerKase.Configure = mockk {
                 every { databaseClient } returns mockDatabaseClient
                 every { createSchemeHistoryRepository() } returns schemeHistoryRepository
-                every { createMigrationDataScanner() } returns migrationDataScanner
+                every { migrationDataScanner } returns mockMigrationDataScanner
             }
             val spannerKase = SpannerKase(configure)
             val exception = assertThrows<Exception> {
@@ -160,7 +166,12 @@ internal class SpannerKaseTest {
         }
     }
 
-    fun createMockkMigrationData(mockVersion: Long, mockName: String, mockSql: String, mockChecksum: Long): MigrationData {
+    fun createMockkMigrationData(
+        mockVersion: Long,
+        mockName: String,
+        mockSql: String,
+        mockChecksum: Long
+    ): MigrationData {
         return mockk {
             every { version } returns mockVersion
             every { name } returns mockName

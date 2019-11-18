@@ -1,8 +1,8 @@
-package app.ubie.spannerkase
+package app.ubie.spannerkase.internal
 
 import java.time.LocalDateTime
 
-data class SchemeHistory(
+internal data class SchemeHistory(
     val installedRank: Long,
     val version: Long,
     val script: String,

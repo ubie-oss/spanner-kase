@@ -86,10 +86,13 @@ fun Application.module(
         databaseAdminClient,
         databaseClient
     )
-    val configure = SpannerKase.Configure(
-        spannerKaseDatabaseClient,
+    val migrationDataScanner = ClassLoaderMigrationDataScanner(
         environment.classLoader, // io.ktor.application.Application.environment
         "db/migration" // relative path from resources dir
+    )
+    val configure = SpannerKase.Configure(
+        spannerKaseDatabaseClient,
+        migrationDataScanner
     ) 
     SpannerKase(configure).migrate()
 }
