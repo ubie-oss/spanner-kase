@@ -1,6 +1,5 @@
-package app.ubie.spannerkase.testtool.internal
+package app.ubie.spannerkase
 
-import app.ubie.spannerkase.ClassLoaderMigrationDataScanner
 import app.ubie.spannerkase.testtool.toEnumeration
 import io.mockk.every
 import io.mockk.mockk
