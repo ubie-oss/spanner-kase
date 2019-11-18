@@ -52,7 +52,7 @@ class SpannerKaseDatabaseClient(
                 script STRING(1000) NOT NULL,
                 checksum INT64 NOT NULL,
                 installed_on TIMESTAMP NOT NULL
-            ) PRIMARY KEY (InstalledRank)
+            ) PRIMARY KEY (installed_rank)
             """.trimIndent()
         databaseAdminClient.updateDatabaseDdl(
             instanceId,
@@ -102,7 +102,7 @@ class SpannerKaseDatabaseClient(
             FROM
               information_schema.tables AS t
             WHERE
-              t.table_catalog = '' and t.table_schema = '' and t.table_name = 'SchemeHistory'
+              t.table_catalog = '' and t.table_schema = '' and t.table_name = 'scheme_history'
 """.trimIndent()
         return databaseClient.singleUse().executeQuery(Statement.of(sql)).run {
             next()
