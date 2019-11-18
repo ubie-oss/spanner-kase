@@ -46,12 +46,12 @@ class SpannerKaseDatabaseClient(
         val sql =
             //language=SQL
             """
-            CREATE TABLE SchemeHistory (
-                InstalledRank INT64 NOT NULL,
-                Version INT64 NOT NULL,
-                Script STRING(1000) NOT NULL,
-                Checksum INT64 NOT NULL,
-                InstalledOn TIMESTAMP NOT NULL
+            CREATE TABLE scheme_history (
+                installed_rank INT64 NOT NULL,
+                version INT64 NOT NULL,
+                script STRING(1000) NOT NULL,
+                checksum INT64 NOT NULL,
+                installed_on TIMESTAMP NOT NULL
             ) PRIMARY KEY (InstalledRank)
             """.trimIndent()
         databaseAdminClient.updateDatabaseDdl(
@@ -67,30 +67,30 @@ class SpannerKaseDatabaseClient(
             //language=SQL
             """
             SELECT
-                InstalledRank, Version, Script, Checksum, InstalledOn
+                installed_rank, version, script, checksum, installed_on
             FROM
-                SchemeHistory
-            ORDER BY InstalledRank
+                scheme_history
+            ORDER BY installed_rank
             """.trimIndent()
         val statement = Statement.of(sql)
         return databaseClient.singleUse().executeQuery(statement).asSequence().map {
             SchemeHistory(
-                installedRank = it.getLong("InstalledRank"),
-                version = it.getLong("Version"),
-                script = it.getString("Script"),
-                checksum = it.getLong("Checksum"),
-                installedOn = it.getTimestamp("InstalledOn").toSqlTimestamp().toLocalDateTime()
+                installedRank = it.getLong("installed_rank"),
+                version = it.getLong("version"),
+                script = it.getString("script"),
+                checksum = it.getLong("checksum"),
+                installedOn = it.getTimestamp("installed_on").toSqlTimestamp().toLocalDateTime()
             )
         }.toList()
     }
 
     internal fun insertSchemeHistory(schemeHistory: SchemeHistory) {
-        val mutation = insert("SchemeHistory") {
-            it["InstalledRank"] = schemeHistory.installedRank
-            it["Version"] = schemeHistory.version
-            it["Script"] = schemeHistory.script
-            it["Checksum"] = schemeHistory.checksum
-            it["InstalledOn"] = schemeHistory.installedOn.toTimestamp()
+        val mutation = insert("scheme_history") {
+            it["installed_rank"] = schemeHistory.installedRank
+            it["version"] = schemeHistory.version
+            it["script"] = schemeHistory.script
+            it["checksum"] = schemeHistory.checksum
+            it["installed_on"] = schemeHistory.installedOn.toTimestamp()
         }
         databaseClient.write(listOf(mutation))
     }
