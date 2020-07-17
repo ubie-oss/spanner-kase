@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "app.ubie"
-version = "1.1.3"
+version = "1.1.4"
 
 repositories {
     jcenter()
@@ -64,8 +64,8 @@ uploadArchives.apply {
                     signing.signPom(this)
                 }
 
-                val username = if(project.hasProperty("sonatypeUsername")) project.properties["sonatypeUsername"] else System.getenv("sonatypeUsername")
-                val password = if(project.hasProperty("sonatypePassword")) project.properties["sonatypePassword"] else System.getenv("sonatypePassword")
+                val username = getProperty("sonatypeUsername")
+                val password = getProperty("sonatypePassword")
 
                 withGroovyBuilder {
                     "snapshotRepository"("url" to "https://oss.sonatype.org/content/repositories/snapshots") {
@@ -113,4 +113,10 @@ uploadArchives.apply {
             }
         }
     }
+}
+
+fun getProperty(propertyName: String): String? {
+    if(project.hasProperty(propertyName))
+        return project.properties[propertyName] as? String
+    return System.getenv(propertyName)
 }

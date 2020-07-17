@@ -7,7 +7,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import sun.net.www.protocol.jar.JarURLConnection
+import java.net.JarURLConnection
 import java.net.URL
 import java.util.jar.JarEntry
 
