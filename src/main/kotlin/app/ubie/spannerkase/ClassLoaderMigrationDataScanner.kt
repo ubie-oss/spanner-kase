@@ -1,7 +1,7 @@
 package app.ubie.spannerkase
 
-import sun.net.www.protocol.jar.JarURLConnection
 import java.io.File
+import java.net.JarURLConnection
 import java.net.URL
 import java.util.jar.JarFile
 
